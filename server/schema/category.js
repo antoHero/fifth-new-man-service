@@ -1,14 +1,14 @@
 import mongoose from 'mongoose';
-import joi from 'joi';
+import Joi from 'joi';
 
 const categorySchema = new mongoose.Schema({
-    title: joi.string().required(),
-    slug: joi.string().nullable(),
-    description: joi.string().nullable(),
-    cover: joi.string().required()
+    title: Joi.string().required(),
+    slug: Joi.string().allow(null),
+    description: Joi.string().allow(null),
+    cover: Joi.string().required()
 },{
     timestamps: true
 });
 
 const Category = mongoose.model('Category', categorySchema);
-module.exports = Category;
+export default Category;
