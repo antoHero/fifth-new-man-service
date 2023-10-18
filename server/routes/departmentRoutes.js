@@ -20,7 +20,13 @@ router.post('/',  asyncHandler(async(req, res) => {
 
 router.get('/', asyncHandler(async(req, res) => {
     const departments = await Department.find();
-    res.status(200).json({message: 'Department successfully retrieved', data: departments});
+    res.status(200).json({message: 'Departments successfully retrieved', data: departments});
+}));
+
+router.get('/:departmentId', asyncHandler(async(req, res) => {
+    const department = await Department.findOne({_id: req.params.departmentId});
+    if(!department) res.status(404).json({message: 'Department not found', data: null});
+    res.status(200).json({message: 'Department successfully retrieved', data: department})
 }));
 
 export default router;
