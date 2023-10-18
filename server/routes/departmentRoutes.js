@@ -29,4 +29,25 @@ router.get('/:departmentId', asyncHandler(async(req, res) => {
     res.status(200).json({message: 'Department successfully retrieved', data: department})
 }));
 
+router.patch('/:departmentId', asyncHandler(async(req, res) => {
+    const keys = Object.keys(req.body);
+    const { title } = req.body
+    const allowedUpdates = ['title', 'slug'];
+    const isValidUpdates = keys.every((key) => allowedUpdates.includes(key));
+    if(!isValidUpdates) return res.status(400).json({message: 'Invalid updates'});
+    const department = await Department.findById(req.params.departmentId);
+    department.title = title;
+    department.slug = slugify(title, {
+        trim: true
+    });
+    await department.save();
+    res.status(200).json({message: 'Department updated successfully', data: department});
+}));
+
+router.delete('/:departmentId', asyncHandler(async (req, res) => {
+    const department = await Department.findByIdAndDelete(req.params.departmentId);
+    if(!department) res.status(404).json({message: 'Department not found', data: null});
+    res.send({message: 'Department deleted successfully'});
+}));
+
 export default router;
