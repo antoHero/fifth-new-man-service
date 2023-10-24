@@ -1,9 +1,11 @@
 import express from 'express';
+import categoryController from '../controllers/category.js';
 import asyncHandler from 'express-async-handler';
 import Category from '../schema/category.js';
 import slugify from 'slugify';
 
 import cloudinary from 'cloudinary';
+import mongoose from 'mongoose';
 const router = new express.Router();
 
 cloudinary.config({
@@ -20,6 +22,7 @@ router.post('/',  asyncHandler(async(req, res) => {
         };
         const result = await cloudinary.uploader.upload(cover, options);
         let data = {
+            _id: new mongoose.Types.ObjectId(),
             title: title,
             slug: slugify(title, {
                 trim: true
@@ -32,17 +35,9 @@ router.post('/',  asyncHandler(async(req, res) => {
         res.status(201).json({message: 'Category successfully created', data: newCategory});
 }));
 
-router.get('/', asyncHandler (async (req, res) => {
-    const categories = await Category.find();
-    res.status(200).json({message: 'Categories successfully retrieved', data: categories});
-}));
+router.get('/', categoryController.get_all_categories);
 
-router.get('/:categoryId', asyncHandler(async (req, res) => {
-    const categoryId = req.params.categoryId;
-    const category = await Category.findOne({_id: categoryId});
-    if(!category) return res.status(404).json({message: 'Category not found'});
-    res.status(200).json({message: 'Category retrieved successfully', data: category});
-}));
+router.get('/:categoryId', categoryController.get_one_category);
 
 
 router.patch('/:categoryId', asyncHandler(async (req, res) => {

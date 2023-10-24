@@ -1,6 +1,8 @@
 import Department from "../schema/department.js";
+import Category from "../schema/category.js";
 import asyncHandler from 'express-async-handler';
 import slugify from 'slugify';
+import mongoose from 'mongoose';
 
 class DepartmentController {
     get_all_departments = asyncHandler(async (req, res) => {
@@ -9,15 +11,23 @@ class DepartmentController {
     })
 
     create_new_department = asyncHandler(async (req, res) => {
-        const { title } = req.body;
+        const { title, category_id } = req.body;
+        const category = await Category.findById(category_id);
+        // console.log("category ",category);
         let data = {
-            title: title,
+            _id: new mongoose.Types.ObjectId(),
+            title,
+            category: category._id,
             slug: slugify(title, {
                 trim: true
             }),
         };
-        const newDepartment = new Department(data);
+
+        const newDepartment = await Department.create(data);
+        // console.log(newDepartment?._id);
+        category.departments.push(newDepartment._id);
         await newDepartment.save();
+        await category.save();
         res.status(201).json({message: 'Department successfully created', data: newDepartment});
     });
 

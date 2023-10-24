@@ -3,7 +3,10 @@ import dotenv from 'dotenv';
 dotenv.config();
 const mongoDBURi = process.env.ATLAS_URI || '';
 
-mongoose.connect(mongoDBURi);
+mongoose.connect(mongoDBURi, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+});
 const database = mongoose.connection;
 
 database.on('error', (error) => {
